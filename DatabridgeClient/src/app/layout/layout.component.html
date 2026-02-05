@@ -1,0 +1,17 @@
+<div class="layout-wrapper">
+  <div class="layout-topbar">
+    <p-menubar [model]="menuItems()">
+      <ng-template pTemplate="start">
+        <div class="layout-topbar-logo">
+          <span class="layout-topbar-logo-text">Databridge</span>
+        </div>
+      </ng-template>
+    </p-menubar>
+  </div>
+  
+  <div class="layout-main-container">
+    <div class="layout-main">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

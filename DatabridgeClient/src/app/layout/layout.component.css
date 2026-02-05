@@ -1,0 +1,39 @@
+.layout-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.layout-topbar {
+  background-color: var(--surface-card);
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.layout-topbar-logo {
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+}
+
+.layout-topbar-logo-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.layout-main-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.layout-main {
+  flex: 1;
+  padding: 2rem;
+  background-color: var(--surface-ground);
+}
+
+:host ::ng-deep .p-menubar {
+  border: none;
+  border-radius: 0;
+}

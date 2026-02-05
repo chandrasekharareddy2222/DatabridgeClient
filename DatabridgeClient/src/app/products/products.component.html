@@ -1,0 +1,139 @@
+<div class="card">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+  
+  <p-toolbar styleClass="mb-4">
+    <ng-template pTemplate="left">
+      <h2 class="m-0">Products Management</h2>
+    </ng-template>
+    <ng-template pTemplate="right">
+      <p-button 
+        severity="success" 
+        label="New" 
+        icon="pi pi-plus" 
+        (onClick)="openNew()"
+      ></p-button>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table 
+    [value]="products()" 
+    [rows]="10" 
+    [paginator]="true" 
+    [rowsPerPageOptions]="[5, 10, 20]"
+    [globalFilterFields]="['name', 'description']"
+    [tableStyle]="{ 'min-width': '50rem' }"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+    [showCurrentPageReport]="true"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="id">ID <p-sortIcon field="id"></p-sortIcon></th>
+        <th pSortableColumn="name">Name <p-sortIcon field="name"></p-sortIcon></th>
+        <th pSortableColumn="description">Description</th>
+        <th pSortableColumn="price">Price <p-sortIcon field="price"></p-sortIcon></th>
+        <th pSortableColumn="stock">Stock <p-sortIcon field="stock"></p-sortIcon></th>
+        <th>Actions</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-product>
+      <tr>
+        <td>{{ product.id }}</td>
+        <td>{{ product.name }}</td>
+        <td>{{ product.description }}</td>
+        <td>{{ product.price | currency:'USD' }}</td>
+        <td>{{ product.stock }}</td>
+        <td>
+          <p-button 
+            icon="pi pi-pencil" 
+            severity="warn" 
+            [rounded]="true" 
+            [text]="true"
+            (onClick)="editProduct(product)"
+            class="mr-2"
+          ></p-button>
+          <p-button 
+            icon="pi pi-trash" 
+            severity="danger" 
+            [rounded]="true" 
+            [text]="true"
+            (onClick)="deleteProduct(product)"
+          ></p-button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="6" class="text-center">No products found.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog 
+  [(visible)]="productDialog" 
+  [style]="{ width: '450px' }" 
+  [header]="isEditMode() ? 'Edit Product' : 'New Product'" 
+  [modal]="true" 
+  styleClass="p-fluid"
+>
+  <ng-template pTemplate="content">
+    <div class="field">
+      <label for="name">Name</label>
+      <input 
+        type="text" 
+        pInputText 
+        id="name" 
+        [(ngModel)]="product().name" 
+        required 
+        autofocus 
+        [ngClass]="{'ng-invalid ng-dirty': submitted() && !product().name}"
+      />
+      <small class="ng-dirty ng-invalid" *ngIf="submitted() && !product().name">Name is required.</small>
+    </div>
+    
+    <div class="field">
+      <label for="description">Description</label>
+      <textarea 
+        id="description" 
+        pInputTextarea 
+        [(ngModel)]="product().description" 
+        required 
+        rows="3"
+      ></textarea>
+    </div>
+
+    <div class="field">
+      <label for="price">Price</label>
+      <p-inputNumber 
+        id="price" 
+        [(ngModel)]="product().price" 
+        mode="currency" 
+        currency="USD" 
+        locale="en-US"
+      ></p-inputNumber>
+    </div>
+
+    <div class="field">
+      <label for="stock">Stock</label>
+      <p-inputNumber 
+        id="stock" 
+        [(ngModel)]="product().stock"
+      ></p-inputNumber>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <p-button 
+      label="Cancel" 
+      icon="pi pi-times" 
+      [text]="true" 
+      (onClick)="hideDialog()"
+    ></p-button>
+    <p-button 
+      label="Save" 
+      icon="pi pi-check" 
+      (onClick)="saveProduct()"
+    ></p-button>
+  </ng-template>
+</p-dialog>
