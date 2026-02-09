@@ -1,0 +1,32 @@
+/* Page spacing specific to Students component */
+.students-page {
+  padding: 1rem;
+}
+
+/* Header title inside toolbar */
+:host ::ng-deep .p-toolbar h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* Table action buttons spacing */
+:host ::ng-deep .p-button.mr-2 {
+  margin-right: 0.5rem;
+}
+
+/* Empty table message */
+.text-center {
+  text-align: center;
+  color: #6b7280;
+}
+
+/* Dialog form field spacing */
+.field {
+  margin-bottom: 1rem;
+}
+
+/* Validation message */
+small.ng-invalid {
+  color: #dc2626;
+}
