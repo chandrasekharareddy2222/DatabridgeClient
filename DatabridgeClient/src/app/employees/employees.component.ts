@@ -16,18 +16,18 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'app-employees',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    TableModule,
-    ButtonModule,
-    DialogModule,
-    InputTextModule,
-    ToastModule,
-    ToolbarModule,
-    ConfirmDialogModule
-  ],
+  // standalone: true,
+  // imports: [
+  //   CommonModule,
+  //   FormsModule,
+  //   TableModule,
+  //   ButtonModule,
+  //   DialogModule,
+  //   InputTextModule,
+  //   ToastModule,
+  //   ToolbarModule,
+  //   ConfirmDialogModule
+  // ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './employees.component.html',
   styleUrls: ['./employees.component.css']
@@ -145,57 +145,6 @@ export class EmployeesComponent implements OnInit {
 
     if (!this.employee().empName?.trim()) return;
 
-    // if (this.isEditMode()) {
-    //   // UPDATE (SP_UpdateEmployeeName)
-    //   this.employeeService
-    //     .updateEmployeeName(this.employee().empId!, this.employee().empName)
-    //     .subscribe({
-    //       next: (res: any) => {
-    //         this.loadEmployees();
-    //         this.messageService.add({
-    //           severity: 'success',
-    //           summary: 'Successful',
-    //           detail: res?.message || 'Employee updated',
-    //           life: 3000
-    //         });
-    //         this.employeeDialog.set(false);
-    //       },
-    //       error: (err: unknown) => {
-    //         this.messageService.add({
-    //           severity: 'error',
-    //           summary: 'Error',
-    //           detail: 'Failed to update employee',
-    //           life: 3000
-    //         });
-    //         }
-    //     });
-
-// if (this.isEditMode()) {
-//   // UPDATE (FULL EMPLOYEE)
-//   this.employeeService
-//     .updateEmployee(this.employee())   // ✅ empId + empName + deptName
-//     .subscribe({
-//       next: (res: any) => {
-//         this.loadEmployees();
-//         this.messageService.add({
-//           severity: 'success',
-//           summary: 'Successful',
-//           detail: res?.message || 'Employee updated',
-//           life: 3000
-//         });
-//         this.employeeDialog.set(false);
-//       },
-//       error: (err: any) => {
-//         console.error('Update error:', err);
-//         this.messageService.add({
-//           severity: 'error',
-//           summary: 'Error',
-//           detail: 'Failed to update employee',
-//           life: 3000
-//         });
-//       }
-//     });
-// }
 if (this.isEditMode()) {
 
   const empId = this.employee().empId;
@@ -279,3 +228,5 @@ if (this.isEditMode()) {
     });
   }
 }
+
+
