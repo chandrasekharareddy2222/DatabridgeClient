@@ -12,7 +12,7 @@ export const routes: Routes = [
       { path: '', redirectTo: 'products', pathMatch: 'full' },
       { path: 'products', component: ProductsComponent },
       { path: 'students', component: StudentsComponent },
-      { path: 'employees', component: EmployeesComponent }
+      { path: 'employees', component: EmployeesComponent },
     ]
   }
 ];

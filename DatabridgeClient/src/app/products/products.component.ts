@@ -52,16 +52,21 @@ export class ProductsComponent implements OnInit {
   }
 
   loadProducts() {
+      console.log('Loading products from API...');
     this.productService.getAllProducts().subscribe({
       next: (data) => {
+          console.log('Products loaded successfully:', data);
         this.products.set(data);
       },
       error: (error) => {
+          console.error('Error loading products:', error);
+          console.error('Error status:', error.status);
+          console.error('Error message:', error.message);
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to load products',
-          life: 3000
+            detail: `Failed to load products: ${error.status} ${error.statusText || error.message}`,
+            life: 5000
         });
       }
     });
@@ -168,5 +173,7 @@ export class ProductsComponent implements OnInit {
         });
       }
     }
+ 
   }
 }
+

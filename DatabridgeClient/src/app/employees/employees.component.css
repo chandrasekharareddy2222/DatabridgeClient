@@ -1,0 +1,127 @@
+Button spacing
+:host ::ng-deep .p-button {
+  margin-right: 0.5rem;
+}
+
+/* Card container */
+:host ::ng-deep .card {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Form field spacing */
+:host ::ng-deep .field {
+  margin-bottom: 1.5rem;
+}
+
+/* Labels */
+:host ::ng-deep .field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #495057;
+  font-size: 0.875rem;
+}
+
+/* Dialog header */
+:host ::ng-deep .p-dialog .p-dialog-header {
+  background: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  padding: 1.25rem 1.5rem;
+  font-weight: 600;
+}
+
+/* Dialog content */
+:host ::ng-deep .p-dialog .p-dialog-content {
+  padding: 2rem 1.5rem;
+}
+
+/* Dialog footer */
+:host ::ng-deep .p-dialog .p-dialog-footer {
+  background: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+  padding: 1rem 1.5rem;
+  text-align: right;
+}
+
+/* Inputs */
+:host ::ng-deep .p-inputtext {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Input focus */
+:host ::ng-deep .p-inputtext:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+  outline: none;
+}
+
+/* Validation error */
+:host ::ng-deep .p-inputtext.ng-invalid.ng-dirty {
+  border-color: #ef4444;
+}
+
+/* Error text */
+:host ::ng-deep .field small.ng-dirty.ng-invalid {
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+/* Footer buttons */
+:host ::ng-deep .p-dialog-footer .p-button {
+  margin-left: 0.5rem;
+  min-width: 100px;
+}
+
+/* Toolbar */
+:host ::ng-deep .p-toolbar {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 1.25rem;
+}
+
+/* Table header */
+:host ::ng-deep .p-table .p-datatable-thead > tr > th {
+  background: #f8f9fa;
+  color: #495057;
+  font-weight: 600;
+  padding: 1rem;
+  border: 1px solid #dee2e6;
+}
+
+/* Table body */
+:host ::ng-deep .p-table .p-datatable-tbody > tr > td {
+  padding: 1rem;
+  border: 1px solid #dee2e6;
+}
+
+/* Hover row */
+:host ::ng-deep .p-table .p-datatable-tbody > tr:hover {
+  background: #f9fafb;
+}
+
+/* Action buttons alignment */
+:host ::ng-deep td .p-button {
+  margin-right: 0.25rem;
+}
+
+/* Paginator */
+:host ::ng-deep .p-paginator {
+  background: #ffffff;
+  border: 1px solid #dee2e6;
+  padding: 0.5rem 1rem;
+}
+
+/* Utility */
+.text-center {
+  text-align: center;
+} 
