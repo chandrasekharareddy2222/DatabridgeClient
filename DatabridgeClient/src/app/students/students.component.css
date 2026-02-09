@@ -1,102 +1,32 @@
-/* PAGE */
+/* Page spacing specific to Students component */
 .students-page {
-  padding: 1.5rem;
+  padding: 1rem;
 }
 
-/* HEADER */
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* Header title inside toolbar */
+:host ::ng-deep .p-toolbar h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* Table action buttons spacing */
+:host ::ng-deep .p-button.mr-2 {
+  margin-right: 0.5rem;
+}
+
+/* Empty table message */
+.text-center {
+  text-align: center;
+  color: #6b7280;
+}
+
+/* Dialog form field spacing */
+.field {
   margin-bottom: 1rem;
 }
 
-/* TABLE */
-.students-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.students-table th,
-.students-table td {
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-}
-
-.students-table th {
-  background: #f4f4f4;
-  text-align: left;
-}
-
-/* ACTIONS */
-.actions {
-  display: flex;
-  gap: 8px;
-}
-
-.icon-btn {
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-.icon-btn.edit {
-  color: #f59e0b;
-}
-
-.icon-btn.delete {
+/* Validation message */
+small.ng-invalid {
   color: #dc2626;
-}
-
-/* BUTTONS */
-.btn-primary {
-  background: #16a34a;
-  color: white;
-  padding: 6px 14px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.btn-secondary {
-  background: #e5e7eb;
-  border: none;
-  padding: 6px 14px;
-  border-radius: 4px;
-}
-
-/* MODAL */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal {
-  background: white;
-  padding: 1.5rem;
-  width: 320px;
-  border-radius: 6px;
-}
-
-.modal label {
-  display: block;
-  margin-top: 10px;
-}
-
-.modal input {
-  width: 100%;
-  padding: 6px;
-  margin-top: 4px;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 1rem;
 }

@@ -1,49 +1,34 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { UiModule } from '../modules/ui.module';
+
 import { ProductService } from '../services/product.service';
 import { Product } from '../models/product.model';
 
-// PrimeNG Imports
-import { TableModule } from 'primeng/table';
-import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { InputTextarea } from 'primeng/inputtextarea';
-import { ToastModule } from 'primeng/toast';
-import { ToolbarModule } from 'primeng/toolbar';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageService, ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    TableModule,
-    ButtonModule,
-    DialogModule,
-    InputTextModule,
-    InputNumberModule,
-    InputTextarea,
-    ToastModule,
-    ToolbarModule,
-    ConfirmDialogModule
-  ],
+  imports: [UiModule],
   providers: [MessageService, ConfirmationService],
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.css']
 })
 export class ProductsComponent implements OnInit {
+
   private readonly productService = inject(ProductService);
   private readonly messageService = inject(MessageService);
   private readonly confirmationService = inject(ConfirmationService);
 
   products = signal<Product[]>([]);
   productDialog = signal(false);
-  product = signal<Product>({ name: '', description: '', price: 0, stock: 0 });
+  product = signal<Product>({
+    name: '',
+    description: '',
+    price: 0,
+    stock: 0
+  });
+
   submitted = signal(false);
   isEditMode = signal(false);
 
@@ -56,7 +41,7 @@ export class ProductsComponent implements OnInit {
       next: (data) => {
         this.products.set(data);
       },
-      error: (error) => {
+      error: () => {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
@@ -97,7 +82,7 @@ export class ProductsComponent implements OnInit {
                 life: 3000
               });
             },
-            error: (error) => {
+            error: () => {
               this.messageService.add({
                 severity: 'error',
                 summary: 'Error',
@@ -122,27 +107,28 @@ export class ProductsComponent implements OnInit {
     if (this.product().name?.trim()) {
       if (this.isEditMode() && this.product().id) {
         // Update
-        this.productService.updateProduct(this.product().id!, this.product()).subscribe({
-          next: () => {
-            this.loadProducts();
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Successful',
-              detail: 'Product Updated',
-              life: 3000
-            });
-            this.productDialog.set(false);
-            this.product.set({ name: '', description: '', price: 0, stock: 0 });
-          },
-          error: (error) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to update product',
-              life: 3000
-            });
-          }
-        });
+        this.productService
+          .updateProduct(this.product().id!, this.product())
+          .subscribe({
+            next: () => {
+              this.loadProducts();
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Successful',
+                detail: 'Product Updated',
+                life: 3000
+              });
+              this.hideDialog();
+            },
+            error: () => {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Failed to update product',
+                life: 3000
+              });
+            }
+          });
       } else {
         // Create
         this.productService.createProduct(this.product()).subscribe({
@@ -154,10 +140,9 @@ export class ProductsComponent implements OnInit {
               detail: 'Product Created',
               life: 3000
             });
-            this.productDialog.set(false);
-            this.product.set({ name: '', description: '', price: 0, stock: 0 });
+            this.hideDialog();
           },
-          error: (error) => {
+          error: () => {
             this.messageService.add({
               severity: 'error',
               summary: 'Error',
