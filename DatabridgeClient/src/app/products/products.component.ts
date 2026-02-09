@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { UiModule } from '../modules/ui.module';
+import { UiModule } from '../app.module';
 
 import { ProductService } from '../services/product.service';
 import { Product } from '../models/product.model';

@@ -3,7 +3,7 @@ import { isPlatformBrowser } from '@angular/common';
 
 import { StudentService } from '../services/student.service';
 import { Student } from '../models/student.model';
-import { UiModule } from '../modules/ui.module';
+import { UiModule } from '../app.module';
 
 // PrimeNG Services
 import { MessageService, ConfirmationService } from 'primeng/api';
