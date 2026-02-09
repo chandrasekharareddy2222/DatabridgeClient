@@ -12,6 +12,7 @@ export class ProductService {
   private readonly apiUrl = `${environment.apiUrl}/Products`;
 
   getAllProducts(): Observable<Product[]> {
+    console.log('ProductService: Fetching from URL:', this.apiUrl);
     return this.http.get<Product[]>(this.apiUrl);
   }
 

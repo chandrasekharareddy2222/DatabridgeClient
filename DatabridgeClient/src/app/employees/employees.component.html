@@ -1,0 +1,154 @@
+<div class="card">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <!-- Toolbar -->
+  <p-toolbar styleClass="mb-4">
+    <ng-template pTemplate="left">
+      <h2 class="m-0">Employee Management</h2>
+    </ng-template>
+    <ng-template pTemplate="right">
+      <p-button
+        severity="success"
+        label="New Employee"
+        icon="pi pi-plus"
+        (onClick)="openNew()"
+      ></p-button>
+    </ng-template>
+  </p-toolbar>
+
+  <!-- Employee Table -->
+  <p-table
+    [value]="employees()"
+    [rows]="10"
+    [paginator]="true"
+    [rowsPerPageOptions]="[5, 10, 20]"
+    [globalFilterFields]="['empName', 'deptName']"
+    [tableStyle]="{ 'min-width': '50rem' }"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+    [showCurrentPageReport]="true"
+  >
+    <!-- Table Header -->
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="empId">
+          Emp ID <p-sortIcon field="empId"></p-sortIcon>
+        </th>
+        <th pSortableColumn="empName">
+          Employee Name <p-sortIcon field="empName"></p-sortIcon>
+        </th>
+        <th pSortableColumn="deptName">
+          Department <p-sortIcon field="deptName"></p-sortIcon>
+        </th>
+        <th>Actions</th>
+      </tr>
+    </ng-template>
+
+    <!-- Table Body -->
+    <ng-template pTemplate="body" let-emp>
+      <tr>
+        <td>{{ emp.empId }}</td>
+        <td>{{ emp.empName }}</td>
+        <td>{{ emp.deptName }}</td>
+        <td>
+          <p-button
+            icon="pi pi-pencil"
+            severity="warn"
+            [rounded]="true"
+            [text]="true"
+            class="mr-2"
+            (onClick)="editEmployee(emp)"
+          ></p-button>
+
+          <p-button
+            icon="pi pi-trash"
+            severity="danger"
+            [rounded]="true"
+            [text]="true"
+            (onClick)="deleteEmployee(emp)"
+          ></p-button>
+        </td>
+      </tr>
+    </ng-template>
+
+    <!-- Empty Message -->
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="4" class="text-center">
+          No employees found.
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- Employee Dialog -->
+<p-dialog
+  [(visible)]="employeeDialog"
+  [style]="{ width: '450px' }"
+  [header]="isEditMode() ? 'Edit Employee' : 'New Employee'"
+  [modal]="true"
+  styleClass="p-fluid"
+>
+  <ng-template pTemplate="content">
+
+    <!-- Employee Name -->
+    <div class="field">
+      <label for="empName">Employee Name</label>
+      <input
+        type="text"
+        pInputText
+        id="empName"
+        [(ngModel)]="employee().empName"
+        required
+        autofocus
+        [ngClass]="{
+          'ng-invalid ng-dirty':
+            submitted() && !employee().empName
+        }"
+      />
+      <small
+        class="ng-dirty ng-invalid"
+        *ngIf="submitted() && !employee().empName"
+      >
+        Employee name is required.
+      </small>
+    </div>
+
+    <!-- Department Name -->
+    <div class="field">
+      <label for="deptName">Department Name</label>
+      <input
+        type="text"
+        pInputText
+        id="deptName"
+        [(ngModel)]="employee().deptName"
+        required
+        [disabled]="isEditMode()"
+      />
+      <small
+        class="ng-dirty ng-invalid"
+        *ngIf="submitted() && !employee().deptName"
+      >
+        Department name is required.
+      </small>
+    </div>
+
+  </ng-template>
+
+  <!-- Dialog Footer -->
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancel"
+      icon="pi pi-times"
+      [text]="true"
+      (onClick)="hideDialog()"
+    ></p-button>
+
+    <p-button
+      label="Save"
+      icon="pi pi-check"
+      (onClick)="saveEmployee()"
+    ></p-button>
+  </ng-template>
+</p-dialog>
