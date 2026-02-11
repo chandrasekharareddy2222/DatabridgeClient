@@ -211,12 +211,11 @@
 
   <!-- Footer -->
   <ng-template pTemplate="footer">
-    <p-button
-      label="Upload"
-      icon="pi pi-check"
-      severity="success"
-      (onClick)="uploadExcel()">
-    </p-button>
+    <button pButton 
+        label="Upload" 
+        (click)="uploadExcel()" 
+        [disabled]="!selectedFile() || fileError()">
+</button>
   </ng-template>
 
 </p-dialog>

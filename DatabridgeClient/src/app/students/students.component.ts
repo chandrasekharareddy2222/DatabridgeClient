@@ -6,8 +6,6 @@ import { Student } from '../models/student.model';
 import { UiModule } from '../app.module';
 import { HttpClient } from '@angular/common/http';
 
-
-
 // PrimeNG Services
 import { MessageService, ConfirmationService } from 'primeng/api';
 
@@ -138,7 +136,7 @@ export class StudentsComponent implements OnInit {
     this.submitted.set(false);
   }
   openUpload() {
-  
+  this.resetUpload();
   this.uploadDialog.set(true);
 }
 
@@ -173,6 +171,7 @@ onFileSelect(event: any) {
   }
 
   this.selectedFile.set(file);
+  this.fileError.set(null); 
 }
 
 uploadExcel() {
