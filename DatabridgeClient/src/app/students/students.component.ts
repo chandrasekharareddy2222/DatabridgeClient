@@ -1,12 +1,20 @@
-import { Component, OnInit, inject, signal, PLATFORM_ID, ViewChild, ElementRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  signal,
+  PLATFORM_ID,
+  ViewChild,
+  ElementRef
+} from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 
 import { StudentService } from '../services/student.service';
 import { Student } from '../models/student.model';
+import { DeleteBatchResponse } from '../models/delete-batch-response.model';
 import { UiModule } from '../app.module';
-import { HttpClient } from '@angular/common/http';
 
-// PrimeNG Services
 import { MessageService, ConfirmationService } from 'primeng/api';
 
 @Component({
@@ -18,41 +26,65 @@ import { MessageService, ConfirmationService } from 'primeng/api';
   styleUrls: ['./students.component.css']
 })
 export class StudentsComponent implements OnInit {
+
+  // =========================
+  // Dependency Injection
+  // =========================
   private readonly studentService = inject(StudentService);
   private readonly messageService = inject(MessageService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly platformId = inject(PLATFORM_ID);
   private readonly http = inject(HttpClient);
 
-
+  // =========================
+  // Signals - Data State
+  // =========================
   students = signal<Student[]>([]);
-  studentDialog = signal(false);
   student = signal<Student>({ studentName: '', age: 0, deptName: '' });
+
+  // =========================
+  // Signals - Dialog State
+  // =========================
+  studentDialog = signal(false);
+  uploadDialog = signal(false);
+
+  // =========================
+  // Signals - Form State
+  // =========================
   submitted = signal(false);
   isEditMode = signal(false);
   selectedStudent = signal<Student | null>(null);
 
-  uploadDialog = signal(false);
+  // =========================
+  // Signals - Upload State
+  // =========================
   selectedFile = signal<File | null>(null);
   fileError = signal<string | null>(null);
 
+  // =========================
+  // Signals - Bulk Selection
+  // =========================
+  selectedStudents = signal<Student[]>([]);
 
-  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('fileInput')
+  fileInput!: ElementRef<HTMLInputElement>;
 
- 
-  ngOnInit() {
-    // Only load on browser, not during SSR
+  // =========================
+  // Lifecycle
+  // =========================
+  ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
       this.loadStudents();
     }
   }
 
-  loadStudents() {
+  // =========================
+  // Load Students
+  // =========================
+  loadStudents(): void {
     this.studentService.getAll().subscribe({
-      next: (data) => {
-        this.students.set(data);
-      },
-      error: (error) => {
+      next: (data) => this.students.set(data),
+      error: () => {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
@@ -63,7 +95,10 @@ export class StudentsComponent implements OnInit {
     });
   }
 
-  openNew() {
+  // =========================
+  // Create / Edit
+  // =========================
+  openNew(): void {
     this.student.set({ studentName: '', age: 0, deptName: '' });
     this.submitted.set(false);
     this.isEditMode.set(false);
@@ -71,14 +106,56 @@ export class StudentsComponent implements OnInit {
     this.studentDialog.set(true);
   }
 
-  editStudent(student: Student) {
+  editStudent(student: Student): void {
     this.student.set({ ...student });
     this.selectedStudent.set(student);
     this.isEditMode.set(true);
     this.studentDialog.set(true);
   }
 
-  deleteStudent(student: Student) {
+  saveStudent(): void {
+    this.submitted.set(true);
+
+    if (!this.student().studentName || !this.student().age || !this.student().deptName) {
+      return;
+    }
+
+    if (this.isEditMode() && this.selectedStudent()?.id) {
+      this.studentService
+        .update(this.selectedStudent()!.id!, this.student())
+        .subscribe(() => {
+          this.loadStudents();
+          this.hideDialog();
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Successful',
+            detail: 'Student Updated',
+            life: 3000
+          });
+        });
+    } else {
+      this.studentService.create(this.student()).subscribe(() => {
+        this.loadStudents();
+        this.hideDialog();
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Successful',
+          detail: 'Student Created',
+          life: 3000
+        });
+      });
+    }
+  }
+
+  hideDialog(): void {
+    this.studentDialog.set(false);
+    this.submitted.set(false);
+  }
+
+  // =========================
+  // Single Delete
+  // =========================
+  deleteStudent(student: Student): void {
     this.confirmationService.confirm({
       message: `Are you sure you want to delete ${student.studentName}?`,
       header: 'Confirm',
@@ -99,118 +176,136 @@ export class StudentsComponent implements OnInit {
     });
   }
 
-  saveStudent() {
-    this.submitted.set(true);
+  // =========================
+  // Bulk Delete
+  // =========================
+  hasSelection(): boolean {
+    return this.selectedStudents().length > 0;
+  }
 
-    if (!this.student().studentName || !this.student().age || !this.student().deptName) {
+  deleteSelectedStudents(): void {
+    const ids = this.selectedStudents()
+      .map(s => s.id)
+      .filter((id): id is number => id !== undefined);
+
+    if (ids.length === 0) return;
+
+    this.confirmationService.confirm({
+      message: `Are you sure you want to delete ${ids.length} selected student(s)?`,
+      header: 'Confirm Bulk Delete',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.studentService.deleteBulk(ids).subscribe({
+          next: (response: DeleteBatchResponse) => {
+            const deleted = response.deletedRows;
+            const missing = response.missingIds;
+
+            this.loadStudents();
+            this.selectedStudents.set([]);
+
+            if (missing.length > 0) {
+              this.messageService.add({
+                severity: 'warn',
+                summary: 'Partial Success',
+                detail: `${deleted} deleted. Missing IDs: ${missing.join(', ')}`,
+                life: 4000
+              });
+            } else {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Successful',
+                detail: `${deleted} student(s) deleted successfully`,
+                life: 3000
+              });
+            }
+          },
+          error: () => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Bulk delete failed',
+              life: 3000
+            });
+          }
+        });
+      }
+    });
+  }
+
+  // =========================
+  // Upload
+  // =========================
+  openUpload(): void {
+    this.resetUpload();
+    this.uploadDialog.set(true);
+  }
+
+  hideUpload(): void {
+    this.uploadDialog.set(false);
+    this.resetUpload();
+  }
+
+  resetUpload(): void {
+    this.selectedFile.set(null);
+    this.fileError.set(null);
+
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
+  }
+
+  onFileSelect(event: any): void {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const allowed = ['.xlsx', '.csv'];
+    const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+
+    if (!allowed.includes(ext)) {
+      this.fileError.set('Only Excel (.xlsx) and CSV (.csv) files are supported.');
       return;
     }
 
-    if (this.isEditMode() && this.selectedStudent()?.id) {
-      this.studentService.update(this.selectedStudent()!.id!, this.student()).subscribe(() => {
-        this.loadStudents();
-        this.hideDialog();
+    this.selectedFile.set(file);
+    this.fileError.set(null);
+  }
+
+  uploadExcel(): void {
+    if (!this.selectedFile()) {
+      this.fileError.set('Please choose a file to upload.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', this.selectedFile()!);
+
+    this.http.post<any>(
+      'https://localhost:7162/api/Student/upload-excel',
+      formData
+    ).subscribe({
+      next: (response) => {
+        const insertedCount = response.recordsInserted;
+
         this.messageService.add({
           severity: 'success',
-          summary: 'Successful',
-          detail: 'Student Updated',
+          summary: 'Upload Successful',
+          detail: insertedCount === 0
+            ? '0 records inserted. All students already exist.'
+            : `${insertedCount} record(s) inserted successfully`,
           life: 3000
         });
-      });
-    } else {
-      this.studentService.create(this.student()).subscribe(() => {
+
+        this.hideUpload();
         this.loadStudents();
-        this.hideDialog();
+      },
+      error: () => {
         this.messageService.add({
-          severity: 'success',
-          summary: 'Successful',
-          detail: 'Student Created',
+          severity: 'error',
+          summary: 'Upload Failed',
+          detail: 'Unable to upload the selected file',
           life: 3000
         });
-      });
-    }
+      }
+    });
   }
-
-  hideDialog() {
-    this.studentDialog.set(false);
-    this.submitted.set(false);
-  }
-  openUpload() {
-  this.resetUpload();
-  this.uploadDialog.set(true);
-}
-
-resetUpload() {
-  this.selectedFile.set(null);
-  this.fileError.set(null);
-
-  // Clear native file input (browser-level)
-  if (this.fileInput) {
-    this.fileInput.nativeElement.value = '';
-  }
-}
-
-
-hideUpload() {
-  this.uploadDialog.set(false);
-  this.resetUpload();
-}
-
-onFileSelect(event: any) {
-  const file = event.target.files?.[0];
-  
-
-  if (!file) return;
-
-  const allowed = ['.xlsx', '.csv'];
-  const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
-
-  if (!allowed.includes(ext)) {
-    this.fileError.set('Only Excel (.xlsx) and CSV (.csv) files are supported.');
-    return;
-  }
-
-  this.selectedFile.set(file);
-  this.fileError.set(null); 
-}
-
-uploadExcel() {
-  if (!this.selectedFile()) {
-    this.fileError.set('Please choose a file to upload.');
-    return;
-  }
-
-  const formData = new FormData();
-  formData.append('file', this.selectedFile()!);
-
-  this.http.post<any>(
-    'https://localhost:7162/api/Student/upload-excel',
-    formData
-  ).subscribe({
-    next: (response) => {
-
-      const insertedCount = response.recordsInserted;
-
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Upload Successful',
-        detail: insertedCount === 0
-          ? '0 records inserted. All students already exist.'
-          : `${insertedCount} record(s) inserted successfully`,
-        life: 3000
-      });
-
-      this.hideUpload();
-      this.loadStudents();
-    },
-    error: () => {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Upload Failed',
-        detail: 'Unable to upload the selected file',
-        life: 3000
-      });
-    }
-  });
-}
 }

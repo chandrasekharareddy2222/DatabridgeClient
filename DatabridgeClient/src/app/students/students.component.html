@@ -8,9 +8,18 @@
       <ng-template pTemplate="left">
         <h2 class="m-0">Students Management</h2>
       </ng-template>
+          
 
       <ng-template pTemplate="right">
         <div class="toolbar-actions">
+          <p-button
+            label="Delete Selected"
+            icon="pi pi-trash"
+            severity="danger"
+            [disabled]="!hasSelection()"
+            (onClick)="deleteSelectedStudents()">
+          </p-button>
+
           <p-button
             severity="success"
             label="New"
@@ -29,17 +38,25 @@
     </p-toolbar>
 
     <!-- Table -->
-    <p-table
-      [value]="students()"
-      [paginator]="true"
-      [rows]="10"
-      [rowsPerPageOptions]="[5,10,20]"
-      [tableStyle]="{ 'min-width': '50rem' }"
-      [showCurrentPageReport]="true"
-      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
+   <p-table
+  [value]="students()"
+  [selection]="selectedStudents()"
+  (selectionChange)="selectedStudents.set($event)"
+  dataKey="id"
+  [paginator]="true"
+  [rows]="10"
+  [rowsPerPageOptions]="[5,10,20]"
+  [tableStyle]="{ 'min-width': '50rem' }"
+  [showCurrentPageReport]="true"
+  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
+
 
       <ng-template pTemplate="header">
         <tr>
+          <th style="width:3rem">
+            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+          </th>
+
           <th pSortableColumn="id">
             Student ID
             <p-sortIcon field="id"></p-sortIcon>
@@ -62,6 +79,10 @@
 
       <ng-template pTemplate="body" let-student>
         <tr>
+          <td>
+          <p-tableCheckbox [value]="student"></p-tableCheckbox>
+          </td>
+
           <td>{{ student.id || student.studentId || 'N/A' }}</td>
           <td>{{ student.studentName }}</td>
           <td>{{ student.age }}</td>
@@ -89,7 +110,7 @@
 
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="5" class="text-center">
+          <td colspan="6" class="text-center">
             No students found.
           </td>
         </tr>

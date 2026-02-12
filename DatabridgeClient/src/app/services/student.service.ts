@@ -4,6 +4,8 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { Student } from '../models/student.model';
+import { DeleteBatchResponse } from '../models/delete-batch-response.model';
+
 
 @Injectable({
   providedIn: 'root'
@@ -59,5 +61,13 @@ export class StudentService {
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+  deleteBulk(ids: number[]): Observable<DeleteBatchResponse> {
+  return this.http.post<DeleteBatchResponse>(
+    `${this.apiUrl}/DeleteBatch`,
+    ids
+  );
+}
+
+
 }
 
