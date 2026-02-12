@@ -9,6 +9,7 @@ import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { FileUploadModule } from 'primeng/fileupload';
 
 import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
@@ -23,6 +24,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
     DialogModule,
     InputTextModule,
     InputNumberModule,
+    FileUploadModule,
 
     ToastModule,
     ToolbarModule,
@@ -36,6 +38,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
     DialogModule,
     InputTextModule,
     InputNumberModule,
+    FileUploadModule,
 
     ToastModule,
     ToolbarModule,

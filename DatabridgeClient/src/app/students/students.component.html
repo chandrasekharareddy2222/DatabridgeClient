@@ -2,135 +2,241 @@
   <div class="card">
     <p-toast></p-toast>
     <p-confirmDialog></p-confirmDialog>
-    
+
+    <!-- Toolbar -->
     <p-toolbar styleClass="mb-4">
       <ng-template pTemplate="left">
         <h2 class="m-0">Students Management</h2>
       </ng-template>
+          
+
       <ng-template pTemplate="right">
-        <p-button 
-          severity="success" 
-          label="New" 
-          icon="pi pi-plus" 
-          (onClick)="openNew()"
-        ></p-button>
+        <div class="toolbar-actions">
+          <p-button
+            label="Delete Selected"
+            icon="pi pi-trash"
+            severity="danger"
+            [disabled]="!hasSelection()"
+            (onClick)="deleteSelectedStudents()">
+          </p-button>
+
+          <p-button
+            severity="success"
+            label="New"
+            icon="pi pi-plus"
+            (onClick)="openNew()">
+          </p-button>
+
+          <p-button
+            severity="success"
+            label=" Work Upload"
+            icon="pi pi-upload"
+            (onClick)="openUpload()">
+          </p-button>
+        </div>
       </ng-template>
     </p-toolbar>
 
-    <p-table 
-      [value]="students()" 
-      [rows]="10" 
-      [paginator]="true" 
-      [rowsPerPageOptions]="[5, 10, 20]"
-      [globalFilterFields]="['studentName', 'deptName']"
-      [tableStyle]="{ 'min-width': '50rem' }"
-      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-      [showCurrentPageReport]="true"
-    >
+    <!-- Table -->
+   <p-table
+  [value]="students()"
+  [selection]="selectedStudents()"
+  (selectionChange)="selectedStudents.set($event)"
+  dataKey="id"
+  [paginator]="true"
+  [rows]="10"
+  [rowsPerPageOptions]="[5,10,20]"
+  [tableStyle]="{ 'min-width': '50rem' }"
+  [showCurrentPageReport]="true"
+  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
+
+
       <ng-template pTemplate="header">
         <tr>
-          <th pSortableColumn="id">Student ID <p-sortIcon field="id"></p-sortIcon></th>
-          <th pSortableColumn="studentName">Name <p-sortIcon field="studentName"></p-sortIcon></th>
-          <th pSortableColumn="age">Age <p-sortIcon field="age"></p-sortIcon></th>
-          <th pSortableColumn="deptName">Department <p-sortIcon field="deptName"></p-sortIcon></th>
+          <th style="width:3rem">
+            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+          </th>
+
+          <th pSortableColumn="id">
+            Student ID
+            <p-sortIcon field="id"></p-sortIcon>
+          </th>
+          <th pSortableColumn="studentName">
+            Name
+            <p-sortIcon field="studentName"></p-sortIcon>
+          </th>
+          <th pSortableColumn="age">
+            Age
+            <p-sortIcon field="age"></p-sortIcon>
+          </th>
+          <th pSortableColumn="deptName">
+            Department
+            <p-sortIcon field="deptName"></p-sortIcon>
+          </th>
           <th>Actions</th>
         </tr>
       </ng-template>
 
       <ng-template pTemplate="body" let-student>
         <tr>
-          <td>{{ student.id || student._studentID || student.StudentId || student.studentId || 'Not Available' }}</td>
+          <td>
+          <p-tableCheckbox [value]="student"></p-tableCheckbox>
+          </td>
+
+          <td>{{ student.id || student.studentId || 'N/A' }}</td>
           <td>{{ student.studentName }}</td>
           <td>{{ student.age }}</td>
           <td>{{ student.deptName }}</td>
           <td>
-            <p-button 
-              icon="pi pi-pencil" 
-              severity="warn" 
-              [rounded]="true" 
+            <p-button
+              icon="pi pi-pencil"
+              severity="warn"
+              [rounded]="true"
               [text]="true"
-              (onClick)="editStudent(student)"
               class="mr-2"
-            ></p-button>
-            <p-button 
-              icon="pi pi-trash" 
-              severity="danger" 
-              [rounded]="true" 
+              (onClick)="editStudent(student)">
+            </p-button>
+
+            <p-button
+              icon="pi pi-trash"
+              severity="danger"
+              [rounded]="true"
               [text]="true"
-              (onClick)="deleteStudent(student)"
-            ></p-button>
+              (onClick)="deleteStudent(student)">
+            </p-button>
           </td>
         </tr>
       </ng-template>
 
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="5" class="text-center">No students found.</td>
+          <td colspan="6" class="text-center">
+            No students found.
+          </td>
         </tr>
       </ng-template>
+
     </p-table>
   </div>
 </div>
 
-<p-dialog 
-  [visible]="studentDialog()" 
+<!-- Student Dialog -->
+<p-dialog
+  [visible]="studentDialog()"
   (visibleChange)="studentDialog.set($event)"
-  [style]="{ width: '450px' }" 
-  [header]="isEditMode() ? 'Edit Student' : 'New Student'" 
-  [modal]="true" 
-  styleClass="p-fluid"
->
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '450px' }"
+  [header]="isEditMode() ? 'Edit Student' : 'New Student'"
+  styleClass="p-fluid">
+
   <ng-template pTemplate="content">
     <div class="field">
-      <label for="studentName">Name</label>
-      <input 
-        type="text" 
-        pInputText 
-        id="studentName" 
-        [(ngModel)]="student().studentName" 
-        required 
-        autofocus 
-        [ngClass]="{'ng-invalid ng-dirty': submitted() && !student().studentName}"
-      />
-      <small class="ng-invalid" *ngIf="submitted() && !student().studentName">Name is required.</small>
-    </div>
-    
-    <div class="field">
-      <label for="age">Age</label>
-      <p-inputNumber 
-        id="age" 
-        [(ngModel)]="student().age" 
-        required
-        [ngClass]="{'ng-invalid ng-dirty': submitted() && !student().age}"
-      ></p-inputNumber>
-      <small class="ng-invalid" *ngIf="submitted() && !student().age">Age is required.</small>
+      <label>Name</label>
+      <input
+        pInputText
+        [(ngModel)]="student().studentName"
+        [ngClass]="{'ng-invalid ng-dirty': submitted() && !student().studentName}">
+      <small class="error-text" *ngIf="submitted() && !student().studentName">
+        Name is required
+      </small>
     </div>
 
     <div class="field">
-      <label for="deptName">Department</label>
-      <input 
-        type="text" 
-        pInputText 
-        id="deptName" 
-        [(ngModel)]="student().deptName" 
-        required 
-        [ngClass]="{'ng-invalid ng-dirty': submitted() && !student().deptName}"
-      />
-      <small class="ng-invalid" *ngIf="submitted() && !student().deptName">Department is required.</small>
+      <label>Age</label>
+      <p-inputNumber
+        [(ngModel)]="student().age"
+        [ngClass]="{'ng-invalid ng-dirty': submitted() && !student().age}">
+      </p-inputNumber>
+      <small class="error-text" *ngIf="submitted() && !student().age">
+        Age is required
+      </small>
+    </div>
+
+    <div class="field">
+      <label>Department</label>
+      <input
+        pInputText
+        [(ngModel)]="student().deptName"
+        [ngClass]="{'ng-invalid ng-dirty': submitted() && !student().deptName}">
+      <small class="error-text" *ngIf="submitted() && !student().deptName">
+        Department is required
+      </small>
     </div>
   </ng-template>
 
   <ng-template pTemplate="footer">
-    <p-button 
-      label="Cancel" 
-      icon="pi pi-times" 
-      text 
-      (onClick)="hideDialog()"
-    ></p-button>
-    <p-button 
-      label="Save" 
-      icon="pi pi-check" 
-      (onClick)="saveStudent()"
-    ></p-button>
+    <p-button
+      label="Cancel"
+      icon="pi pi-times"
+      [text]="true"
+      (onClick)="hideDialog()">
+    </p-button>
+
+    <p-button
+      label="Save"
+      icon="pi pi-check"
+      severity="success"
+      (onClick)="saveStudent()">
+    </p-button>
   </ng-template>
+</p-dialog>
+
+<!-- Upload Dialog -->
+
+<p-dialog
+  [visible]="uploadDialog()"
+  (visibleChange)="uploadDialog.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '420px' }"
+  styleClass="p-fluid">
+
+  <!-- Custom Header -->
+  <ng-template pTemplate="header">
+    <div style="display: flex; align-items: center; width: 100%;">
+      <span style="flex: 1; font-weight: 600;">
+        Upload Students
+      </span>
+
+      <!-- Refresh button (left of X) -->
+      <button
+        type="button"
+        pButton
+        icon="pi pi-refresh"
+        class="p-button-text"
+        (click)="resetUpload()">
+      
+
+      </button>
+    </div>
+  </ng-template>
+
+  <!-- Dialog Content -->
+  <ng-template pTemplate="content">
+  <div class="field file-input-wrapper">
+    <input
+      #fileInput
+      type="file"
+      accept=".xlsx,.csv"
+      (change)="onFileSelect($event)">
+  </div>
+
+  <small class="error-text" *ngIf="fileError()">
+    {{ fileError() }}
+  </small>
+</ng-template>
+
+
+  <!-- Footer -->
+  <ng-template pTemplate="footer">
+    <button pButton 
+        label="Upload" 
+        (click)="uploadExcel()" 
+        [disabled]="!selectedFile() || fileError()">
+</button>
+  </ng-template>
+
 </p-dialog>
