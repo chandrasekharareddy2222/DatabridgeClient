@@ -133,7 +133,10 @@
 
   <ng-template pTemplate="content">
     <div class="field">
-      <label>Name</label>
+      <label>
+      Name<span class="required-star">*</span>
+      </label>
+
       <input
         pInputText
         [(ngModel)]="student().studentName"
@@ -143,19 +146,28 @@
       </small>
     </div>
 
-    <div class="field">
-      <label>Age</label>
-      <p-inputNumber
-        [(ngModel)]="student().age"
-        [ngClass]="{'ng-invalid ng-dirty': submitted() && !student().age}">
-      </p-inputNumber>
-      <small class="error-text" *ngIf="submitted() && !student().age">
-        Age is required
-      </small>
-    </div>
+<div class="field">
+  <label>
+    Age<span class="required-star">*</span>
+  </label>
+
+<p-inputNumber
+  [ngClass]="{'ng-invalid ng-dirty': submitted() && (!student().age || student().age <= 0)}"
+  [ngModel]="student().age === 0 ? null : student().age"
+  (ngModelChange)="updateAgeFromInput($event)">
+</p-inputNumber>
+
+
+  <small class="error-text" *ngIf="submitted() && (!student().age || student().age <= 0)">
+    Age is required
+  </small>
+</div>
 
     <div class="field">
-      <label>Department</label>
+        <label>
+         Department<span class="required-star">*</span>
+        </label>
+
       <input
         pInputText
         [(ngModel)]="student().deptName"
@@ -174,12 +186,15 @@
       (onClick)="hideDialog()">
     </p-button>
 
-    <p-button
-      label="Save"
-      icon="pi pi-check"
-      severity="success"
-      (onClick)="saveStudent()">
-    </p-button>
+    <button
+  pButton
+  type="button"
+  label="Save"
+  icon="pi pi-check"
+  (click)="saveStudent()"
+  [disabled]="isFormInvalid()">
+</button>
+
   </ng-template>
 </p-dialog>
 
@@ -238,5 +253,4 @@
         [disabled]="!selectedFile() || fileError()">
 </button>
   </ng-template>
-
 </p-dialog>
