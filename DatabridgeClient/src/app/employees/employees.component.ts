@@ -54,16 +54,16 @@ export class EmployeesComponent implements OnInit {
         this.employees.set(data);
       },
       error: (err) => {
-          console.error('Error loading employees:', err);
-          console.error('Error status:', err.status);
-          console.error('Error message:', err.message);
+        console.error('Error loading employees:', err);
+        console.error('Error status:', err.status);
+        console.error('Error message:', err.message);
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
           detail: `Failed to load employees:${err.status} ${err.statusText || err.message}`,
           life: 4000
         });
-    
+
       }
     });
   }
@@ -87,8 +87,8 @@ export class EmployeesComponent implements OnInit {
     this.isEditMode.set(true);
     this.employeeDialog.set(true);
   }
- 
-  
+
+
 
   /* DELETE */
   deleteEmployee(emp: Employee) {
@@ -115,7 +115,7 @@ export class EmployeesComponent implements OnInit {
                 detail: 'Failed to delete employee',
                 life: 3000
               });
-             
+
             }
           });
         }
@@ -133,26 +133,24 @@ export class EmployeesComponent implements OnInit {
   saveEmployee() {
     this.submitted.set(true);
 
-    if (!this.employee().empName?.trim()) return;
+    const currentEmp = this.employee();
 
-if (this.isEditMode()) {
 
-  const empId = this.employee().empId;
-  const empName = this.employee().empName;
+    if (!currentEmp.empName?.trim()) return;
 
-  this.employeeService
-    .updateEmployeeName(empId!, empName)
-    .subscribe({
+const request$ = this.isEditMode()
+  ? this.employeeService.updateEmployeeName(currentEmp.empId!, currentEmp) 
+  : this.employeeService.createEmployee(currentEmp);
+    request$.subscribe({
       next: (res: any) => {
-
+        
         // ✅ backend validation message
-        if (res?.message && res.message !== 'Employee updated successfully') {
-          this.messageService.add({
-            severity: 'warn',
-            summary: 'Warning',
-            detail: res.message,
-            life: 3000
-          });
+        if (res?.message && res.message.includes('already exists')) {
+          this.messageService.add({ 
+          severity: 'warn',
+          summary: 'Warning',
+          detail: res.message 
+        });
           return;
         }
 
@@ -170,45 +168,12 @@ if (this.isEditMode()) {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to update employee',
-          life: 3000
+          detail: `Failed: ${err.statusText || 'Server Error'}`
         });
       }
     });
-}
-
-
-    else {
-      // CREATE (SP_AddEmployee)
-      this.employeeService.addEmployee(
-        this.employee().empName,
-        this.employee().deptName
-      ).subscribe({
-        next: (res: any) => {
-          this.loadEmployees();
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Successful',
-            detail: res?.message || 'Employee added',
-            life: 3000
-          });
-          this.employeeDialog.set(false);
-          this.employee.set({empName: '', deptName: ''});
-        },
-        error: (err: unknown) => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to add employee',
-            life: 3000
-          });
-          console.error('addEmployee error', err);
-        }
-      });
-    }
   }
-
-/* ================= UPDATE EMPLOYEE FIELDS ================= */
+  /* ================= UPDATE EMPLOYEE FIELDS ================= */
   updateEmpName(name: string) {
     this.employee.update(e => ({ ...e, empName: name }));
   }
