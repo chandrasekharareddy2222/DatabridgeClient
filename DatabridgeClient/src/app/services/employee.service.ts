@@ -16,50 +16,28 @@ export class EmployeeService {
   private readonly platformId = inject(PLATFORM_ID);
 
   // ✅ BASE CONTROLLER URL ONLY
-  private readonly baseUrl = `${environment.apiUrl}/Employee`;
+  private readonly apiUrl = `${environment.apiUrl}/Employees`;
 
   /* ================= GET ALL EMPLOYEES ================= */
   getAllEmployees(): Observable<Employee[]> {
-
-    if (!isPlatformBrowser(this.platformId)) {
-      return new Observable<Employee[]>(observer => {
-        observer.next([]);
-        observer.complete();
-      });
-    }
-
-    return this.http.get<Employee[]>(`${this.baseUrl}/get-all-full`);
-  }
-
-  /* ================= ADD EMPLOYEE ================= */
-  addEmployee(empName: string, deptName: string): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}/add`, {
-      empName,
-      deptName
-    });
-  }
-
-  /* ================= DELETE EMPLOYEE ================= */
-  deleteEmployee(empId: number): Observable<any> {
-    return this.http.delete<any>(`${this.baseUrl}/${empId}`);
-  }
-
-  /* ================= UPDATE EMPLOYEE NAME ================= */
-//   updateEmployee(employee: Employee): Observable<any> {
-//   return this.http.put<any>(`${this.baseUrl}/update-name`, {
-//     empId: employee.empId,
-//     empName: employee.empName
-//   });
-// }
-
-
-updateEmployeeName(empId: number, empName: string) {
-  return this.http.put<any>(
-    `${this.baseUrl}/update-name/${empId}`,  
-    { empName }                               
-  );
+    
+  return this.http.get<Employee[]>(this.apiUrl);
 }
 
+/* ================= ADD/CREATE EMPLOYEE ================= */
 
-  
+createEmployee(employee: Employee): Observable<any> {
+  return this.http.post<any>(`${this.apiUrl}/add-employee`, employee);
+}
+
+/* ================= UPDATE EMPLOYEE ================= */
+updateEmployeeName(empId: number, employee: Employee): Observable<Employee> {
+  // ✅ Added 'update-employee' to match your C# [HttpPut("update-employee/{empId}")]
+  return this.http.put<Employee>(`${this.apiUrl}/update-employee/${empId}`, employee);
+}
+
+/* ================= DELETE EMPLOYEE ================= */
+deleteEmployee(empId: number): Observable<void> {
+  return this.http.delete<void>(`${this.apiUrl}/delete-employee/${empId}`);
+}
 }
