@@ -135,6 +135,8 @@
   display: block;
 }
 
-:host ::ng-deep body {
-  overflow-y: scroll !important;
+
+.required-star {
+  color: #dc3545; /* professional red */
+  margin-left: 2px;
 }

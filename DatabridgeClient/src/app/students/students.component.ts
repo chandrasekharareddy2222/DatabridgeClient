@@ -146,6 +146,26 @@ export class StudentsComponent implements OnInit {
       });
     }
   }
+updateAgeFromInput(value: number | null) {
+  const s = this.student();
+  this.student.set({
+    studentName: s.studentName,
+    deptName: s.deptName,
+    age: value ?? 0
+  });
+}
+
+
+   isFormInvalid(): boolean {
+    const s = this.student();
+
+    return (
+      !s.studentName?.trim() ||
+      !s.age ||
+      s.age <= 0 ||
+      !s.deptName?.trim()
+    );
+  }
 
   hideDialog(): void {
     this.studentDialog.set(false);
