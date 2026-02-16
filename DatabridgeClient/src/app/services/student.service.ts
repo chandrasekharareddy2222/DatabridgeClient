@@ -63,7 +63,7 @@ export class StudentService {
   }
   deleteBulk(ids: number[]): Observable<DeleteBatchResponse> {
   return this.http.post<DeleteBatchResponse>(
-    `${this.apiUrl}/DeleteBatch`,
+    `${this.apiUrl}/delete-batch`,
     ids
   );
 }

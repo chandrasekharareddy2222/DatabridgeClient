@@ -65,6 +65,14 @@ export class StudentsComponent implements OnInit {
   // Signals - Bulk Selection
   // =========================
   selectedStudents = signal<Student[]>([]);
+  // =========================
+  // Signals - Department Validation
+  // =========================
+  departments = signal<string[]>([]);
+  nameError = signal<string | null>(null);
+  ageError = signal<string | null>(null);
+  deptError = signal<string | null>(null);
+
 
   @ViewChild('fileInput')
   fileInput!: ElementRef<HTMLInputElement>;
@@ -84,6 +92,7 @@ export class StudentsComponent implements OnInit {
   loadStudents(): void {
     this.studentService.getAll().subscribe({
       next: (data) => this.students.set(data),
+      
       error: () => {
         this.messageService.add({
           severity: 'error',
@@ -112,40 +121,150 @@ export class StudentsComponent implements OnInit {
     this.isEditMode.set(true);
     this.studentDialog.set(true);
   }
+  onNameChange(value: string) {
+  this.student.update(s => ({ ...s, studentName: value }));
+  this.nameError.set(null);  
+}
 
-  saveStudent(): void {
-    this.submitted.set(true);
+onAgeChange(value: number) {
+  this.student.update(s => ({ ...s, age: value }));
+  this.ageError.set(null);  
+}
 
-    if (!this.student().studentName || !this.student().age || !this.student().deptName) {
+onDeptChange(value: string) {
+  this.student.update(s => ({ ...s, deptName: value }));
+  this.deptError.set(null);   
+}
+
+saveStudent(): void {
+  this.submitted.set(true);
+
+  // Reset previous errors
+  this.nameError.set(null);
+  this.ageError.set(null);
+  this.deptError.set(null);
+
+  const student = this.student();
+
+  // Frontend validation
+  if (!student.studentName?.trim()) {
+    this.nameError.set('Name is required');
+    return;
+  }
+
+  if (!student.age || student.age <= 0) {
+    this.ageError.set('Valid age is required');
+    return;
+  }
+
+  if (!student.deptName?.trim()) {
+    this.deptError.set('Department is required');
+    return;
+  }
+
+  // Decide create or update
+  const request$ =
+    this.isEditMode() && this.selectedStudent()?.id
+      ? this.studentService.update(this.selectedStudent()!.id!, student)
+      : this.studentService.create(student);
+
+  request$.subscribe({
+    next: () => {
+      this.loadStudents();
+      this.hideDialog();
+
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: this.isEditMode()
+          ? 'Student updated successfully'
+          : 'Student created successfully',
+        life: 3000
+      });
+    },
+
+    error: (err) => {
+      this.handleBackendError(err);
+    }
+  });
+}
+private handleBackendError(err: any): void {
+
+  // 409 - Conflict (Department not exists)
+  if (err.status === 409 && err.error?.message) {
+
+    if (err.error.message.toLowerCase().includes('department')) {
+      this.deptError.set(err.error.message);
       return;
     }
 
-    if (this.isEditMode() && this.selectedStudent()?.id) {
-      this.studentService
-        .update(this.selectedStudent()!.id!, this.student())
-        .subscribe(() => {
-          this.loadStudents();
-          this.hideDialog();
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Successful',
-            detail: 'Student Updated',
-            life: 3000
-          });
-        });
-    } else {
-      this.studentService.create(this.student()).subscribe(() => {
-        this.loadStudents();
-        this.hideDialog();
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Successful',
-          detail: 'Student Created',
-          life: 3000
-        });
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Conflict',
+      detail: err.error.message,
+      life: 3000
+    });
+    return;
+  }
+
+  // 400 - Model validation errors
+  if (err.status === 400) {
+
+    // If ASP.NET ModelState errors
+    if (err.error?.errors) {
+
+      if (err.error.errors.StudentName) {
+        this.nameError.set(err.error.errors.StudentName[0]);
+      }
+
+      if (err.error.errors.Age) {
+        this.ageError.set(err.error.errors.Age[0]);
+      }
+
+      return;
+    }
+
+    // 🔥 If custom validation message
+    if (err.error?.message) {
+
+      const message = err.error.message.toLowerCase();
+
+      if (message.includes('name')) {
+        this.nameError.set(err.error.message);
+        return;
+      }
+
+      if (message.includes('age')) {
+        this.ageError.set(err.error.message);
+        return;
+      }
+
+      if (message.includes('department')) {
+        this.deptError.set(err.error.message);
+        return;
+      }
+
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Validation Error',
+        detail: err.error.message,
+        life: 3000
       });
+
+      return;
     }
   }
+
+  // Fallback
+  this.messageService.add({
+    severity: 'error',
+    summary: 'Error',
+    detail: 'Unexpected error occurred.',
+    life: 3000
+  });
+}
+
+
 updateAgeFromInput(value: number | null) {
   const s = this.student();
   this.student.set({
