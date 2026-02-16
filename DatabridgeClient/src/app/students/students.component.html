@@ -132,50 +132,57 @@
   styleClass="p-fluid">
 
   <ng-template pTemplate="content">
-    <div class="field">
-      <label>
+      <div class="field">
+    <label>
       Name<span class="required-star">*</span>
-      </label>
+    </label>
+    <input
+      pInputText
+      [(ngModel)]="student().studentName"
+       (ngModelChange)="onNameChange($event)"
+      [ngClass]="{'ng-invalid ng-dirty': submitted() && (!student().studentName || nameError())}">
+    <small class="error-text" *ngIf="submitted() && !student().studentName">
+      Name is required
+    </small>
+    <small class="error-text" *ngIf="nameError()">
+      {{ nameError() }}
+    </small>
+  </div>
 
-      <input
-        pInputText
-        [(ngModel)]="student().studentName"
-        [ngClass]="{'ng-invalid ng-dirty': submitted() && !student().studentName}">
-      <small class="error-text" *ngIf="submitted() && !student().studentName">
-        Name is required
-      </small>
-    </div>
+  <div class="field">
+    <label>
+      Age<span class="required-star">*</span>
+    </label>
+    <p-inputNumber
+      [ngClass]="{'ng-invalid ng-dirty': submitted() && (!student().age || ageError())}"
+      [ngModel]="student().age === 0 ? null : student().age"
+     (ngModelChange)="onAgeChange($event)">
+    </p-inputNumber>
+    <small class="error-text" *ngIf="submitted() && (!student().age || student().age <= 0)">
+      Age is required
+    </small>
+    <small class="error-text" *ngIf="ageError()">
+      {{ ageError() }}
+    </small>
+  </div>
 
-<div class="field">
-  <label>
-    Age<span class="required-star">*</span>
-  </label>
-
-<p-inputNumber
-  [ngClass]="{'ng-invalid ng-dirty': submitted() && (!student().age || student().age <= 0)}"
-  [ngModel]="student().age === 0 ? null : student().age"
-  (ngModelChange)="updateAgeFromInput($event)">
-</p-inputNumber>
-
-
-  <small class="error-text" *ngIf="submitted() && (!student().age || student().age <= 0)">
-    Age is required
-  </small>
+  <div class="field">
+    <label>
+      Department<span class="required-star">*</span>
+    </label>
+    <input
+      pInputText
+      [(ngModel)]="student().deptName"
+       (ngModelChange)="onDeptChange($event)"
+      [ngClass]="{'ng-invalid ng-dirty': submitted() && (!student().deptName || deptError())}">
+    <small class="error-text" *ngIf="submitted() && !student().deptName">
+      Department is required
+    </small>
+    <small class="error-text" *ngIf="deptError()">
+      {{ deptError() }}
+    </small>
 </div>
 
-    <div class="field">
-        <label>
-         Department<span class="required-star">*</span>
-        </label>
-
-      <input
-        pInputText
-        [(ngModel)]="student().deptName"
-        [ngClass]="{'ng-invalid ng-dirty': submitted() && !student().deptName}">
-      <small class="error-text" *ngIf="submitted() && !student().deptName">
-        Department is required
-      </small>
-    </div>
   </ng-template>
 
   <ng-template pTemplate="footer">
