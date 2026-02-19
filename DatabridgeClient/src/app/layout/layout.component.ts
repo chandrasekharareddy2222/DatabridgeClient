@@ -12,6 +12,7 @@ import { MenuItem } from 'primeng/api';
   styleUrls: ['./layout.component.css']
 })
 export class LayoutComponent {
+
   menuItems = signal<MenuItem[]>([
     {
       label: 'Products',
@@ -27,6 +28,11 @@ export class LayoutComponent {
       label: 'Employees',
       icon: 'pi pi-briefcase',
       routerLink: '/employees'
+    },
+    {
+      label: 'Members',
+      icon: 'pi pi-book',
+      routerLink: '/members'
     }
   ]);
 }

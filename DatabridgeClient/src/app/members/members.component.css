@@ -1,0 +1,104 @@
+
+:host ::ng-deep .p-button {
+  margin-right: 0.5rem;
+}
+
+:host ::ng-deep .field {
+  margin-bottom: 1.5rem;
+}
+
+:host ::ng-deep .field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #495057;
+  font-size: 0.875rem;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-header {
+  background: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  padding: 1.5rem;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-content {
+  padding: 2rem 1.5rem;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-footer {
+  background: #f9f8fa;
+  border-top: 1px solid #dee2e6;
+  padding: 1rem 1.5rem;
+  text-align: right;
+}
+
+:host ::ng-deep .p-inputtext,
+:host ::ng-deep .p-inputnumber-input,
+:host ::ng-deep .p-inputtextarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  transition: border-color 0.2s;
+}
+
+:host ::ng-deep .p-inputtext:focus,
+:host ::ng-deep .p-inputnumber-input:focus,
+:host ::ng-deep .p-inputtextarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+  outline: 0;
+}
+
+:host ::ng-deep .p-inputtext.ng-invalid.ng-dirty,
+:host ::ng-deep .p-inputnumber-input.ng-invalid.ng-dirty {
+  border-color: #ef4444;
+}
+
+:host ::ng-deep .field small.ng-dirty.ng-invalid {
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+:host ::ng-deep .p-dialog-footer .p-button {
+  margin-left: 0.5rem;
+  margin-right: 0;
+  min-width: 100px;
+}
+
+:host ::ng-deep .p-toolbar {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 1.25rem;
+}
+
+:host ::ng-deep .p-table .p-datatable-thead > tr > th {
+  background: #f8f9fa;
+  color: #495057;
+  font-weight: 600;
+  padding: 1rem;
+  border: 1px solid #dee2e6;
+}
+
+:host ::ng-deep .p-table .p-datatable-tbody > tr > td {
+  padding: 1rem;
+  border: 1px solid #dee2e6;
+}
+
+:host ::ng-deep .p-table .p-datatable-tbody > tr:hover {
+  background: #f8f9fa;
+}
+
+:host ::ng-deep .p-paginator {
+  background: #ffffff;
+  border: 1px solid #dee2e6;
+  padding: 0.5rem 1rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
