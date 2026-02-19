@@ -104,6 +104,7 @@
         pInputText
         id="empName"
         [(ngModel)]="employee().empName"
+        (ngModelChange)="updateEmpName($event)"
         required
         autofocus
       />
@@ -115,6 +116,7 @@
         pInputText
         id="deptName"
         [(ngModel)]="employee().deptName"
+        (ngModelChange)="updateDeptName($event)"
         required
       />
     </div>

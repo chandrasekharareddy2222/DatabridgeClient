@@ -17,7 +17,8 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 @Component({
   selector: 'app-employees',
   standalone: true,
-  imports:[CommonModule, FormsModule, TableModule, ButtonModule, DialogModule, InputTextModule, ToastModule, ToolbarModule, ConfirmDialogModule],
+  imports:[CommonModule, FormsModule, TableModule, ButtonModule, DialogModule,
+     InputTextModule, ToastModule, ToolbarModule, ConfirmDialogModule],
   providers: [MessageService, ConfirmationService],
   templateUrl: './employees.component.html',
   styleUrls: ['./employees.component.css']
@@ -46,28 +47,20 @@ export class EmployeesComponent implements OnInit {
 
   /* GET ALL */
 
-  loadEmployees() {
-    console.log('Loading Employees from API...');
-    this.employeeService.getAllEmployees().subscribe({
-      next: (data ) => {
-        console.log('employees loaded successfully:', data)
-        this.employees.set(data);
-      },
-      error: (err) => {
-        console.error('Error loading employees:', err);
-        console.error('Error status:', err.status);
-        console.error('Error message:', err.message);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: `Failed to load employees:${err.status} ${err.statusText || err.message}`,
-          life: 4000
-        });
+loadEmployees() {
+  console.log('Loading Employees from API...');
+  this.employeeService.getAllEmployees().subscribe({
 
-      }
-    });
-  }
-
+    next: (data: Employee[]) => { 
+      console.log('employees loaded successfully:', data);
+      this.employees.set(data);
+    },
+    error: (err: any) => { 
+      console.error('Error loading employees:', err);
+      
+    }
+  });
+}
 
   /* OPEN NEW */
   openNew() {
@@ -173,6 +166,7 @@ const request$ = this.isEditMode()
       }
     });
   }
+  
   /* ================= UPDATE EMPLOYEE FIELDS ================= */
   updateEmpName(name: string) {
     this.employee.update(e => ({ ...e, empName: name }));
