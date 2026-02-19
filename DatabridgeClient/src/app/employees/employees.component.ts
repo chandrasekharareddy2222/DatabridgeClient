@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EmployeeService } from '../services/employee.service';
 import { Employee } from '../models/Employee.model';
+import { UiModule } from '../app.module';
 
 // PrimeNG Imports
 import { TableModule } from 'primeng/table';
@@ -17,8 +18,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 @Component({
   selector: 'app-employees',
   standalone: true,
-  imports:[CommonModule, FormsModule, TableModule, ButtonModule, DialogModule,
-     InputTextModule, ToastModule, ToolbarModule, ConfirmDialogModule],
+  imports:[UiModule],
   providers: [MessageService, ConfirmationService],
   templateUrl: './employees.component.html',
   styleUrls: ['./employees.component.css']
@@ -166,7 +166,7 @@ const request$ = this.isEditMode()
       }
     });
   }
-  
+
   /* ================= UPDATE EMPLOYEE FIELDS ================= */
   updateEmpName(name: string) {
     this.employee.update(e => ({ ...e, empName: name }));
@@ -185,6 +185,49 @@ const request$ = this.isEditMode()
       life: 3000
     });
   }
+
+  selectedEmployees: Employee[] = []; 
+  /* ================= BULK DELETE ================= */
+  // ADD THIS: Method to handle the bulk delete button click
+  deleteSelectedEmployees() {
+    if (!this.selectedEmployees || this.selectedEmployees.length === 0) return;
+
+    this.confirmationService.confirm({
+      message: 'Are you sure you want to delete the selected employees?',
+      header: 'Confirm',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        // 1. Extract just the IDs from the selected Employee objects
+        const idsToDelete = this.selectedEmployees
+          .map(emp => emp.empId)
+          .filter(id => id !== undefined) as number[];
+        // 2. Call the service
+        this.employeeService.deleteMultipleEmployees(idsToDelete).subscribe({
+          next: (res: any) => {
+            this.loadEmployees();       // Refresh the table
+            this.selectedEmployees = []; // Clear the checkboxes
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Successful',
+              detail: res?.message || 'Employees deleted successfully',
+              life: 3000
+            });
+          },
+          error: (err: any) => {
+            console.error('Bulk delete error:', err);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Failed to delete selected employees',
+              life: 3000
+            });
+          }
+        });
+      }
+    });
+  }
+  
+
 }
 
 

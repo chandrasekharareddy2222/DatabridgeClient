@@ -41,4 +41,12 @@ export class EmployeeService {
     // UPDATED: Appended /delete-employee/{id} to match C# [HttpDelete("delete-employee/{empId}")]
     return this.http.delete<any>(`${this.apiUrl}/delete-employee/${id}`);
   }
+ 
+  /* ================= DELETE MULTIPLE EMPLOYEES ================= */
+  deleteMultipleEmployees(empIds: number[]): Observable<any> {
+    // Angular HttpClient requires the body to be passed in an options object for DELETE requests
+    return this.http.delete<any>(`${this.apiUrl}/delete-multiple`, {
+      body: { empIds: empIds } // This matches your C# DeleteMultipleEmployeesRequest
+    });
+  }
 }
