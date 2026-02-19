@@ -10,56 +10,43 @@ import { isPlatformBrowser } from '@angular/common';
 @Injectable({
   providedIn: 'root'
 })
-export class EmployeeService {
+export class EmployeeService { 
 
   private readonly http = inject(HttpClient);
   private readonly platformId = inject(PLATFORM_ID);
+  
+  // BASE CONTROLLER URL ONLY
+  private readonly apiUrl = 'https://localhost:7162/api/Employees'; 
 
-  // ✅ BASE CONTROLLER URL ONLY
-  private readonly baseUrl = `${environment.apiUrl}/Employee`;
-
-  /* ================= GET ALL EMPLOYEES ================= */
+   /* ================= GET ALL EMPLOYEES ================= */
   getAllEmployees(): Observable<Employee[]> {
 
-    if (!isPlatformBrowser(this.platformId)) {
-      return new Observable<Employee[]>(observer => {
-        observer.next([]);
-        observer.complete();
-      });
-    }
-
-    return this.http.get<Employee[]>(`${this.baseUrl}/get-all-full`);
+    return this.http.get<Employee[]>(this.apiUrl);
   }
 
-  /* ================= ADD EMPLOYEE ================= */
-  addEmployee(empName: string, deptName: string): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}/add`, {
-      empName,
-      deptName
+/* ================= ADD/CREATE EMPLOYEE ================= */
+
+  createEmployee(employee: Employee): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/add-employee`, employee);
+  }
+
+/* ================= UPDATE EMPLOYEE ================= */
+  updateEmployeeName(id: number, employee: Employee): Observable<any> {
+    // UPDATED: Appended /update-employee/{id} to match C# [HttpPut("update-employee/{empId}")]
+    return this.http.put<any>(`${this.apiUrl}/update-employee/${id}`, employee);
+  }
+
+/* ================= DELETE EMPLOYEE ================= */
+  deleteEmployee(id: number): Observable<any> {
+    // UPDATED: Appended /delete-employee/{id} to match C# [HttpDelete("delete-employee/{empId}")]
+    return this.http.delete<any>(`${this.apiUrl}/delete-employee/${id}`);
+  }
+ 
+  /* ================= DELETE MULTIPLE EMPLOYEES ================= */
+  deleteMultipleEmployees(empIds: number[]): Observable<any> {
+    // Angular HttpClient requires the body to be passed in an options object for DELETE requests
+    return this.http.delete<any>(`${this.apiUrl}/delete-multiple`, {
+      body: { empIds: empIds } // This matches your C# DeleteMultipleEmployeesRequest
     });
   }
-
-  /* ================= DELETE EMPLOYEE ================= */
-  deleteEmployee(empId: number): Observable<any> {
-    return this.http.delete<any>(`${this.baseUrl}/${empId}`);
-  }
-
-  /* ================= UPDATE EMPLOYEE NAME ================= */
-//   updateEmployee(employee: Employee): Observable<any> {
-//   return this.http.put<any>(`${this.baseUrl}/update-name`, {
-//     empId: employee.empId,
-//     empName: employee.empName
-//   });
-// }
-
-
-updateEmployeeName(empId: number, empName: string) {
-  return this.http.put<any>(
-    `${this.baseUrl}/update-name/${empId}`,  
-    { empName }                               
-  );
-}
-
-
-  
 }

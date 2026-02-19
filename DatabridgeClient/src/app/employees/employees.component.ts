@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EmployeeService } from '../services/employee.service';
 import { Employee } from '../models/Employee.model';
+import { UiModule } from '../app.module';
 
 // PrimeNG Imports
 import { TableModule } from 'primeng/table';
@@ -17,7 +18,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 @Component({
   selector: 'app-employees',
   standalone: true,
-  imports:[CommonModule, FormsModule, TableModule, ButtonModule, DialogModule, InputTextModule, ToastModule, ToolbarModule, ConfirmDialogModule],
+  imports:[UiModule],
   providers: [MessageService, ConfirmationService],
   templateUrl: './employees.component.html',
   styleUrls: ['./employees.component.css']
@@ -46,28 +47,20 @@ export class EmployeesComponent implements OnInit {
 
   /* GET ALL */
 
-  loadEmployees() {
-    console.log('Loading Employees from API...');
-    this.employeeService.getAllEmployees().subscribe({
-      next: (data ) => {
-        console.log('employees loaded successfully:', data)
-        this.employees.set(data);
-      },
-      error: (err) => {
-          console.error('Error loading employees:', err);
-          console.error('Error status:', err.status);
-          console.error('Error message:', err.message);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: `Failed to load employees:${err.status} ${err.statusText || err.message}`,
-          life: 4000
-        });
-    
-      }
-    });
-  }
+loadEmployees() {
+  console.log('Loading Employees from API...');
+  this.employeeService.getAllEmployees().subscribe({
 
+    next: (data: Employee[]) => { 
+      console.log('employees loaded successfully:', data);
+      this.employees.set(data);
+    },
+    error: (err: any) => { 
+      console.error('Error loading employees:', err);
+      
+    }
+  });
+}
 
   /* OPEN NEW */
   openNew() {
@@ -87,8 +80,8 @@ export class EmployeesComponent implements OnInit {
     this.isEditMode.set(true);
     this.employeeDialog.set(true);
   }
- 
-  
+
+
 
   /* DELETE */
   deleteEmployee(emp: Employee) {
@@ -115,7 +108,7 @@ export class EmployeesComponent implements OnInit {
                 detail: 'Failed to delete employee',
                 life: 3000
               });
-             
+
             }
           });
         }
@@ -133,26 +126,24 @@ export class EmployeesComponent implements OnInit {
   saveEmployee() {
     this.submitted.set(true);
 
-    if (!this.employee().empName?.trim()) return;
+    const currentEmp = this.employee();
 
-if (this.isEditMode()) {
 
-  const empId = this.employee().empId;
-  const empName = this.employee().empName;
+    if (!currentEmp.empName?.trim()) return;
 
-  this.employeeService
-    .updateEmployeeName(empId!, empName)
-    .subscribe({
+const request$ = this.isEditMode()
+  ? this.employeeService.updateEmployeeName(currentEmp.empId!, currentEmp) 
+  : this.employeeService.createEmployee(currentEmp);
+    request$.subscribe({
       next: (res: any) => {
-
+        
         // ✅ backend validation message
-        if (res?.message && res.message !== 'Employee updated successfully') {
-          this.messageService.add({
-            severity: 'warn',
-            summary: 'Warning',
-            detail: res.message,
-            life: 3000
-          });
+        if (res?.message && res.message.includes('already exists')) {
+          this.messageService.add({ 
+          severity: 'warn',
+          summary: 'Warning',
+          detail: res.message 
+        });
           return;
         }
 
@@ -170,45 +161,13 @@ if (this.isEditMode()) {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to update employee',
-          life: 3000
+          detail: `Failed: ${err.statusText || 'Server Error'}`
         });
       }
     });
-}
-
-
-    else {
-      // CREATE (SP_AddEmployee)
-      this.employeeService.addEmployee(
-        this.employee().empName,
-        this.employee().deptName
-      ).subscribe({
-        next: (res: any) => {
-          this.loadEmployees();
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Successful',
-            detail: res?.message || 'Employee added',
-            life: 3000
-          });
-          this.employeeDialog.set(false);
-          this.employee.set({empName: '', deptName: ''});
-        },
-        error: (err: unknown) => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to add employee',
-            life: 3000
-          });
-          console.error('addEmployee error', err);
-        }
-      });
-    }
   }
 
-/* ================= UPDATE EMPLOYEE FIELDS ================= */
+  /* ================= UPDATE EMPLOYEE FIELDS ================= */
   updateEmpName(name: string) {
     this.employee.update(e => ({ ...e, empName: name }));
   }
@@ -226,6 +185,49 @@ if (this.isEditMode()) {
       life: 3000
     });
   }
+
+  selectedEmployees: Employee[] = []; 
+  /* ================= BULK DELETE ================= */
+  // ADD THIS: Method to handle the bulk delete button click
+  deleteSelectedEmployees() {
+    if (!this.selectedEmployees || this.selectedEmployees.length === 0) return;
+
+    this.confirmationService.confirm({
+      message: 'Are you sure you want to delete the selected employees?',
+      header: 'Confirm',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        // 1. Extract just the IDs from the selected Employee objects
+        const idsToDelete = this.selectedEmployees
+          .map(emp => emp.empId)
+          .filter(id => id !== undefined) as number[];
+        // 2. Call the service
+        this.employeeService.deleteMultipleEmployees(idsToDelete).subscribe({
+          next: (res: any) => {
+            this.loadEmployees();       // Refresh the table
+            this.selectedEmployees = []; // Clear the checkboxes
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Successful',
+              detail: res?.message || 'Employees deleted successfully',
+              life: 3000
+            });
+          },
+          error: (err: any) => {
+            console.error('Bulk delete error:', err);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Failed to delete selected employees',
+              life: 3000
+            });
+          }
+        });
+      }
+    });
+  }
+  
+
 }
 
 

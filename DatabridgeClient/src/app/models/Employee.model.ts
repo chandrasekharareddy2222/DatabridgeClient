@@ -3,3 +3,4 @@ export interface Employee {
   empName: string;
   deptName: string;
 }
+ 
